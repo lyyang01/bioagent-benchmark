@@ -1,1 +1,1 @@
-# boos-copilot
+# benchmarking bioagent
