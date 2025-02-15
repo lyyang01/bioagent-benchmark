@@ -1,0 +1,1 @@
+Perform assigning single-cell RNA-seq data to known cell types with CellAssign. Datasets are provided in '/mnt/data00/share_data/agent_benchmark/cellassign/03/sce_follicular.h5ad', and '/mnt/data00/share_data/agent_benchmark/cellassign/03/fl_celltype.csv'. sce_follicular.h5ad is the follicular lymphoma data. fl_celltype.csv is the marker gene matrix.

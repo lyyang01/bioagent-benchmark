@@ -1,0 +1,1 @@
+Isolating perturbation-induced variations with contrastiveVI which aims to gain new insights as to gene functions (e.g. pathway membership) and the relationships between different genes. Datasets are provided in the path '/mnt/data00/share_data/agent_benchmark/contrastivevi/norman_2019.h5ad'.
