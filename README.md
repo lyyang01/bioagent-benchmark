@@ -6,7 +6,9 @@
 
 This repository contains the code and data for **"Benchmarking LLM Agents for Single-cell Omics Analysis"**, a comprehensive evaluation framework designed to systematically assess the capabilities of Large Language Model (LLM)-based agents in single-cell omics analysis tasks.
 
-![Framework Overview](./asserts/framework.png)Figure. Overview of the benchmarking framework architecture
+![Framework Overview](./asserts/framework.png)<p align="center">
+Fig1.Overview of the benchmarking framework architecture
+</p>
 
 ## 🔬 Research Highlights
 
