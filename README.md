@@ -77,7 +77,7 @@ Detailed results and analysis will be available in our paper and the `results/` 
 If you use this framework or dataset in your research, please cite our paper:
 
 ```bibtex
-@article{author2024benchmarking,
+@article{author2025benchmarking,
   title={Benchmarking LLM Agents for Single-cell Omics Analysis},
   author={Author, First and Author, Second and Author, Third},
   journal={arXiv preprint arXiv:XXXX.XXXXX},
