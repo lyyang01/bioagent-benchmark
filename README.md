@@ -62,17 +62,6 @@ Our benchmarking framework consists of four key components:
 
 *(to be updated soon)*
 
-## 📈 Evaluation Results
-
-Our evaluation reveals:
-
-- **Performance Variations**: Significant differences across LLM models and agent frameworks
-- **Task-Specific Strengths**: Different agents excel in different types of single-cell analysis
-- **Framework Trade-offs**: Distinct advantages in control granularity, scalability, and robustness
-- **Integration Capabilities**: Varying success in multi-modal data analysis and tool orchestration
-
-Detailed results and analysis will be available in our paper and the `results/` directory soon.
-
 
 ## 📄 Citation
 
