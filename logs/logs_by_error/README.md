@@ -7,7 +7,7 @@ Each file documents anonymized examples or summaries for a specific error type.
 
 ## 📘 File Naming Convention
 
-<error_type>.<framework>_<model>_<task>.json
+`<error_type>.<framework>_<model>_<task>.json`
 
 **Examples:**
 
