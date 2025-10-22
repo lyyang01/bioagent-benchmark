@@ -12,7 +12,6 @@ Each file documents anonymized examples or summaries for a specific error type.
 **Examples:**
 
 ambiguous_input_prompt.langgraph_grok3-beta_deeptree.json
-interrupted_execution.react_gpt-4o_scpoli.json
 
 Explanation:
 - `<error_type>` — standardized error name in lowercase with underscores  
