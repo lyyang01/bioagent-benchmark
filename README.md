@@ -79,7 +79,7 @@ config_list = [
        "model": "xxx",
     }
 ]
-
+from autogen import UserProxyAgent
 llm_config = {"config_list": config_list, "seed": 42, "timeout": 7200, "temperature": 0}
 user_proxy = UserProxyAgent(
         name="user_proxy",
