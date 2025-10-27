@@ -1,6 +1,6 @@
 # Benchmarking LLM Agents for Single-cell Omics Analysis
 
-[![Paper](https://img.shields.io/badge/Paper-arXiv-red)](https://arxiv.org/abs/2508.13201) [![Dataset](https://img.shields.io/badge/Dataset-Available-blue)](https://claude.ai/chat/89eaffbd-376e-46dc-bdf7-2db7db858d04#dataset) [![License](https://img.shields.io/badge/License-MIT-yellow)](https://opensource.org/licenses/MIT)
+[![Paper](https://img.shields.io/badge/Paper-arXiv-red)](https://arxiv.org/abs/2508.13201) [![Dataset](https://img.shields.io/badge/Dataset-Available-blue)](https://doi.org/10.5281/zenodo.17291196) [![License](https://img.shields.io/badge/License-MIT-yellow)](https://opensource.org/licenses/MIT)
 
 ## Overview
 
