@@ -96,8 +96,28 @@ user_proxy = UserProxyAgent(
 
 ## 🚀 Quick Start
 
-*(to be updated soon)*
+Before starting:
 
+- Fill in your LLM credentials in model_config.py under autogen/langgraph/react-code.
+- Set your embedding model for retrieval: in run.py for autogen-code, or in rag.py for langgraph/react.
+- Check that every tool's Conda env name is correct in prompts/prompt_gradient.
+
+Then run any agent workflow with the scripts in the scripts folder.
+
+FOR AUTOGEN
+```bash
+bash scripts/autogen_run_workflow.sh
+```
+
+FOR LANGGRAPH
+```bash
+bash scripts/langgraph_run_workflow.sh
+```
+
+FOR
+```bash
+bash scripts/react_run_workflow.sh
+```
 
 ## 📄 Citation
 

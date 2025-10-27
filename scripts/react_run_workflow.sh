@@ -22,5 +22,5 @@ for KEY in "${KEYS[@]}"; do
     source activate base
 
     conda activate "${CONDA_ENV}"
-    python ./react_run_workflow.py --tool $KEY --model $MODEL --gpu 0 --lab "main_result"
+    python ./scripts/react_run_workflow.py --tool $KEY --model $MODEL --gpu 0 --lab "main_result"
 done

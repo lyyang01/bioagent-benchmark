@@ -6,7 +6,7 @@ from langgraph.graph.message import add_messages
 from langgraph.managed import IsLastStep, RemainingSteps
 from logger_manager import init_logger  # Modified import
 from utils import serialize_to_json, kill_child_processes
-from config import initialize_llm
+from model_config import initialize_llm
 from typing import Annotated
 from typing_extensions import TypedDict
 import argparse, json, traceback

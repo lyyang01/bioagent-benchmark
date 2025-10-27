@@ -42,7 +42,7 @@ for tool_name in tool_names:
         #try:
             #def monitor_process(script_path, tool_name, model_name, log_path):
             #------------------time
-        script_path = "/autogen-code/biobench-09-freepart2.py"
+        script_path = "/autogen-code/run.py"
         
         log_file = os.path.join(root_path, f"{tool_name}_monitor_log.csv")
         

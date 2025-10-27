@@ -21,5 +21,5 @@ for KEY in "${KEYS[@]}"; do
         exit 1
     fi
     conda activate "${CONDA_ENV}"
-    python ./langgraph_run_workflow.py --tool $KEY --model $MODEL --gpu 0 --lab "main_result"
+    python ./scripts/langgraph_run_workflow.py --tool $KEY --model $MODEL --gpu 0 --lab "main_result"
 done

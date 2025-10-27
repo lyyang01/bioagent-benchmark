@@ -19,5 +19,5 @@ for KEY in "${KEYS[@]}"; do
     
     source activate base
     conda activate "${CONDA_ENV}"
-    CUDA_VISIBLE_DEVICES=0 python ./llm-agent/autogen_run_workflow.py --tool $KEY --model $MODEL
+    CUDA_VISIBLE_DEVICES=0 python ./scripts/autogen_run_workflow.py --tool $KEY --model $MODEL
 done
