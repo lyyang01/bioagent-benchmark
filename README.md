@@ -62,11 +62,7 @@ We add instructions for the folders in the published dataset as the following:
 
 - agent_benchmark
 
-Datasets used in the benchmark.
-
-'main' contains 50 tasks/tools for the main results.
-
-'multiple-datasets' contains 13 tasks/tools and each task/tool implement on two different datasets. Here, 'data1' from 'main' and 'data2' is another different dataset.
+Datasets used in the benchmark. 'main' contains 50 tasks/tools for the main results. 'multiple-datasets' contains 13 tasks/tools and each task/tool implement on two different datasets. Here, 'data1' from 'main' and 'data2' is another different dataset.
 
 - database
 
