@@ -18,41 +18,6 @@ Fig1.Overview of the benchmarking framework architecture
 - **Curated Task Dataset**: 50 representative single-cell omics analysis tasks with gold-standard outputs
 - **17 Quantitative Metrics**: Comprehensive evaluation across cognitive synthesis, task quality, knowledge integration, and collaborative efficiency
 
-## 🏗️ Framework Architecture
-
-Our benchmarking framework consists of four key components:
-
-### 1. Benchmarking Pipeline
-
-- **Multi-framework Support**: ReAct, LangGraph, and AutoGen implementations
-- **Plan-Execute-Reflect Loop**: Dynamic task adaptation with autonomous tool orchestration
-- **Comprehensive Logging**: Full monitoring and evaluation of agent execution processes
-- **Flexible Input/Output**: Support for scRNA-seq, spatial transcriptomics, and multi-modal data
-
-### 2. Evaluation Metrics
-
-- **17 Quantitative Metrics** across four dimensions:
-    - Cognitive Program Synthesis
-    - Task Quality Assessment
-    - Knowledge Integration
-    - Collaborative Execution Efficiency
-- **Robustness Analysis**: Prompt variation testing and architectural component influence
-
-### 3. LLM and Agent Framework Integration
-
-- **8 LLM Models**: GPT-4o/4.1, Claude 3.7 Sonnet, DeepSeek R1/v3, Grok3, Gemini 2.5, Qwen 2.5
-- **3 Agent Frameworks**: ReAct, LangGraph, AutoGen
-- **Comparative Analysis**: Workflow orchestration, memory management, and scalability assessment
-
-### 4. Single-Cell Omics Task Dataset
-
-- **50 Curated Tasks** spanning:
-    - Cell type classification
-    - Trajectory inference
-    - Multi-modal data integration
-    - Spatial transcriptomics analysis
-- **Multi-language Support**: Scripts in Python, R, and other relevant languages
-- **Gold-standard Outputs**: Reference results for systematic evaluation
 
 ## 📊 Dataset
 
@@ -79,6 +44,9 @@ Saved results from codes written by human researchers. These results can be h5ad
 - input_prompt
 
 Input prompts used in agents. 50 prompts for 'main' test and 13*2 prompts for 'multiple-datasets' test. Besides, for "main", gradient prompts are in the json file as well.
+
+## 🏗️ LLM Configuration
+
 
 
 ## 🚀 Quick Start
