@@ -1,1 +1,0 @@
-Perform atlas-level integration of lung data with scANVI. Datasets are provided in '/mnt/data00/share_data/agent_benchmark/scanvi/lung_atlas.h5ad'. lung_atlas.h5ad is the data needed to be integrated. Do not scale the data.

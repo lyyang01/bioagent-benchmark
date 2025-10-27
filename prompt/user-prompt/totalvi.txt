@@ -1,1 +1,0 @@
-Integrate CITE-seq and scRNA-seq datasets with totalVI. Datasets can be obtained by 'scvi.data.pbmcs_10x_cite_seq(save_path='./data/')' where batch 0 corresponds to PBMC10k batch 1 corresponds to PBMC5k in adata.

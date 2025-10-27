@@ -1,0 +1,111 @@
+{
+
+"decoupler": {
+  "prompt_input": {
+    "basic": "Use Decoupler for automated cell type annotation of single-cell RNA sequencing data.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/decoupler/pbmc3k_raw.h5ad'\n- Marker genes: '/mnt/data00/share_data/agent_benchmark/decoupler/marker_genes.csv'\n\nMust-save Results:\n- Make sure cell type annotation result of decoupler is stored in adata.obs['cell_type'] and save adata.obs['cell_type'] as 'decoupler.csv'"
+  },
+  "conda_env": "scvitool",
+  "language": "python"
+},
+
+"paga": {
+  "prompt_input": {
+      "basic": "Use PAGA (Partition-based Graph Abstraction) for trajectory analysis of single-cell RNA sequencing data.\n\nDataset location:\n- Input data: please use 'scanpy.datasets.paul15()' to load the input data and then use 'scanpy.pp.recipe_zheng17(adata)' to preprocess the data.\n\nMust-save Results:\n- Generate abstracted graph representation in adata.uns['paga']['connectivities'] showing connectivity strength between different cell clusters\n- Save the connectivity matrix from adata.uns['paga']['connectivities'] as 'paga.csv'"
+  },
+  "conda_env": "scvitool",
+  "language": "python"
+},
+
+"destvi": {
+  "prompt_input": {
+      "basic": "Use DestVI for spatial deconvolution of spatial transcriptomics data.\n\nDataset location:\n- scRNA-seq data: '/mnt/data00/share_data/agent_benchmark/destvi/scRNA-LN-compressed.h5ad'\n- Spatial data: '/mnt/data00/share_data/agent_benchmark/destvi/ST-LN-compressed.h5ad'\n\nMust-save Results:\n- Make sure cell type proportions are stored in st_adata.obsm['proportions'] and save st_adata.obsm['proportions'][['B cells', 'CD8 T cells', 'Monocytes']] as 'destvi.csv'"
+  },
+    "conda_env": "scvitool",
+      "language": "python"
+},
+
+
+
+"leiden": {
+  "prompt_input": {
+      "basic": "Use Leiden algorithm for clustering single-cell RNA sequencing data.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/leiden/s1d1_filtered_feature_bc_matrix.h5'\n- Input data: '/mnt/data00/share_data/agent_benchmark/leiden/s1d3_filtered_feature_bc_matrix.h5'\n\nMust-save Results:\n- Make sure UMAP embeddings are stored in adata.obsm['X_umap'] and save adata.obsm['X_umap'] as 'leiden.csv'"
+  },
+    "conda_env": "scvitool",
+      "language": "python"
+},
+
+
+"mofa": {
+  "prompt_input": {
+      "basic": "Use MOFA for multi-omics factor analysis of single-cell data.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/mofa/pbmc10k.h5mu'\n\nMust-save Results:\n- Make sure multi-omics factor analysis results are stored in mdata.obsm['X_mofa'] and save mdata.obsm['X_mofa'] as 'mofa.csv'"
+  },
+    "conda_env": "scvitool",
+      "language": "python"
+},
+
+
+
+"triku": {
+  "prompt_input": {
+      "basic": "Use Triku for feature selection in single-cell RNA sequencing data.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/triku/pbmc3k_raw.h5ad'\n\nMust-save Results:\n- Make sure Triku dimension reduction results are stored in pbmc.obsm['X_triku'] and save pbmc.obsm['X_triku'].data as 'triku.csv'"
+  },
+    "conda_env": "scvitool",
+      "language": "python"
+},
+
+"hotspot": {
+  "prompt_input": {
+      "basic": "Use Hotspot for spatial gene expression analysis in Slide-seq data.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/hotspot/rodriques_slideseq.h5ad'\n\nMust-save Results:\n- Make sure module scores are stored in module_scores DataFrame and save module_scores as 'hotspot.csv'"
+  },
+    "conda_env": "scvitool",
+      "language": "python"
+},
+
+
+"scanvi": {
+  "prompt_input": {
+    "basic": "Perform atlas-level integration of lung data with scANVI. Do not scale the data during preprocessing.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/scanvi/lung_atlas.h5ad'\n\nMust-save Results:\n- Make sure atlas-level integration result of scANVI is stored in obsm['X_scanvi'] and save the integrated adata as 'scanvi.h5ad'"
+  },
+    "conda_env": "scvitool",
+      "language": "python"
+},
+
+"contrastivevi": {
+  "prompt_input": {
+    "basic": "Isolating perturbation-induced variations with contrastiveVI which aims to gain new insights as to gene functions (e.g. pathway membership) and the relationships between different genes.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/contrastivevi/norman_2019.h5ad'. In the provided h5ad file, whether a cell is a perturbed cell is indicated by the 'gene_program' parameter in the obs. Cells with a value of 'Ctrl' are non-perturbed cells, while those with a value not equal to 'Ctrl' are perturbed cells.\n\nMust-save Results:\n- Make sure the result by contrastivevi is stored in obsm['salient_rep'] and save the result in obsm['salient_rep'] as 'contrastivevi.csv'"
+  },
+    "conda_env": "scvitool",
+      "language": "python"
+},
+"peakvi": {
+  "prompt_input": {
+    "basic": "Use PeakVI to identify which regions are differentially accessible, i.e., chromatin accessibility.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/peakvi/atac_pbmc_5k.untar/filtered_peak_bc_matrix'. The data is 10X scATACseq data sampled from 10X of 5K PBMCs.\n\nMust-save Results:\n- Make sure the result by peakvi is stored in obsm['X_peakvi']. and save the result in obsm['X_peakvi'] as 'peakvi.csv'"
+  },
+    "conda_env": "scvitool",
+      "language": "python"
+},
+
+"gimvi": {
+  "prompt_input": {
+    "basic": "Impute missing genes in spatial data from sequencing data with gimVI.\n\nDataset location:\n- Input data: You can use smfish('/mnt/data00/share_data/agent_benchmark/gimvi/') to load the spatial data and use corted('/mnt/data00/share_data/agent_benchmark/gimvi/') to load the scRNA-seq data. smfish and cortex can be imported from scvi.data.\n\nMust-save Results:\n- Make sure the result by gimvi is stored in obsm['X_umap'] and save the result in obsm['X_umap'] as 'gimvi.csv'"
+  },
+    "conda_env": "scvitool",
+      "language": "python"
+},
+
+"cellchat": {
+  "prompt_input": {
+    "basic": "Perform inference and analysis of cell-cell communication using CellChat.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/cellchat/data_humanSkin_CellChat.rda'\n\nMust-save Results:\n- Make sure the result by cellchat is stored in cellchat@net$weight. Assign the value of cellchat@net$weight to saved_data and save it as 'cellchat.RData'"
+  },
+  "conda_env": "bioRenv2",
+  "language": "R"
+},
+
+"sctransform": {
+  "prompt_input": {
+    "basic": "Apply sctransform normalization and then perform dimensionality reduction by PCA and UMAP embedding.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/sctransform/pbmc3k/filtered_gene_bc_matrices/hg19/'. You can use Read10X to read the data."
+  },
+  "conda_env": "bioRenv2",
+  "language": "R"
+}
+}

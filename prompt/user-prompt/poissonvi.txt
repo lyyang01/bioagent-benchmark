@@ -1,1 +1,0 @@
-Analyze quantitative scATAC-seq fragment counts with PoissonVI. Datasets are provided in '/mnt/data00/share_data/agent_benchmark/poissonvi/atac_pbmc_5k.untar/filtered_peak_bc_matrix'. filtered_peak_bc_matrix is a folder that contains scATACseq data sampled  from 10X of 5K PBMCs to be analyzed.

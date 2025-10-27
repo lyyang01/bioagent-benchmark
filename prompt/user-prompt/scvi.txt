@@ -1,1 +1,0 @@
-Perform atlas-level integration of lung data with scVI. the dataset that needs to be integrated is in the path '/mnt/data00/share_data/agent_benchmark/scvi/lung_atlas.h5ad'. Do not scale the data.
