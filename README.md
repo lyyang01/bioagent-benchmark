@@ -114,7 +114,7 @@ FOR LANGGRAPH
 bash scripts/langgraph_run_workflow.sh
 ```
 
-FOR
+FOR REACT
 ```bash
 bash scripts/react_run_workflow.sh
 ```
