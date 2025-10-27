@@ -47,6 +47,48 @@ Input prompts used in agents. 50 prompts for 'main' test and 13*2 prompts for 'm
 
 ## 🏗️ LLM Configuration
 
+We used OpenAI’s official API function and left all parameters at their defaults except that we manually set temperature to 0.
+
+```python
+##FOR LANGGRAPH and REACT
+#set config
+LLM_CONFIG = {
+      "gpt-4o": {
+      "api_version": "xxx",
+      "base_url": "xxx",
+      "api_key": "xxx",
+      "model": "xxx",
+    }
+}
+from langchain_openai import ChatOpenAI
+ChatOpenAI(
+    openai_api_key=config["api_key"],
+    openai_api_base=config["base_url"],
+    model_name=config["model"],
+    temperature=0, 
+)
+
+
+##FOR AUTOGEN
+#set config
+config_list = [
+  {
+       "api_type": "openai",
+       "base_url": "xxx",
+       "api_key": "xxx",
+       "model": "xxx",
+    }
+]
+
+llm_config = {"config_list": config_list, "seed": 42, "timeout": 7200, "temperature": 0}
+user_proxy = UserProxyAgent(
+        name="user_proxy",
+        human_input_mode="NEVER",
+        llm_config=llm_config,
+        code_execution_config=False,
+        system_message="you are a helpful assistant"
+    )
+```
 
 
 ## 🚀 Quick Start
