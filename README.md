@@ -45,6 +45,9 @@ Saved results from codes written by human researchers. These results can be h5ad
 
 Input prompts used in agents. 50 prompts for 'main' test and 13*2 prompts for 'multiple-datasets' test. Besides, for "main", gradient prompts are in the json file as well.
 
+##⚡Environments
+(to be updated soon.)
+
 ## 🏗️ LLM Configuration
 
 We used OpenAI’s official API function and left all parameters at their defaults except that we manually set temperature to 0.
