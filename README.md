@@ -56,7 +56,27 @@ Our benchmarking framework consists of four key components:
 
 ## 📊 Dataset
 
-**Download Dataset**: *(to be updated soon)*
+**Download Dataset**: All datasets used in our benchmark are published at https://doi.org/10.5281/zenodo.17291196
+
+We add instructions for the folders in the published dataset as the following:
+
+- agent_benchmark
+Datasets used in the benchmark.
+'main' contains 50 tasks/tools for the main results.
+'multiple-datasets' contains 13 tasks/tools and each task/tool implement on two different datasets. Here, 'data1' from 'main' and 'data2' is another different dataset.
+
+- database
+The tool base used in the benchmark. All 50 tools' documents are included. These documents contain how to use functions of different tools.
+
+- groundtruth_code
+The notebook and py/R script written by human researchers. They will be regarded as groundtruth codes during code evaluation.
+
+- groundtruth_result
+Saved results from codes written by human researchers. These results can be h5ad/csv/npy/RData types and will be regarded as groundtruth results during result consistency evaluation.
+
+- input_prompt
+Input prompts used in agents. 50 prompts for 'main' test and 13*2 prompts for 'multiple-datasets' test. Besides, for "main", gradient prompts are in the json file as well.
+
 
 ## 🚀 Quick Start
 
