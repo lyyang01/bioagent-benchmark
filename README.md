@@ -57,7 +57,7 @@ We used OpenAI’s official API function and left all parameters at their defaul
 #set config
 LLM_CONFIG = {
       "gpt-4o": {
-      "api_version": "xxx",
+      "api_type": "openai",
       "base_url": "xxx",
       "api_key": "xxx",
       "model": "xxx",

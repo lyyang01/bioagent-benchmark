@@ -11,10 +11,10 @@ LLM_CONFIG = {
        "model": "xxx",
    },
    "gpt-4o": {
-       "api_version": "2024-06-01",
-       "base_url": "https://aoai-apis.xmindai.cn/openai/deployments/xchat4o/chat/completions?api-version=2024-06-01",
-       "api_key": "b3e1b40501854d7e8cd753dbfb97487c",
-       "model": "gpt-4o",
+       "api_version": "xxx",
+       "base_url": "xxx",
+       "api_key": "xxx",
+       "model": "xxx",
    },
     "deepseek-r1": {
        "api_version": "xxxx",
