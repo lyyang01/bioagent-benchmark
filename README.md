@@ -95,7 +95,7 @@ user_proxy = UserProxyAgent(
 ```
 
 
-## 🚀 Quick Start (For run workflow)
+## 🚀 Quick Start (For running workflow)
 
 Before starting:
 
@@ -121,7 +121,7 @@ FOR REACT
 bash run_workflow/react_run_workflow.sh
 ```
 
-## 🚀 Quick Start (For evaluation)
+## 🚀 Quick Start (For running evaluation)
 
 Before starting: 
 
