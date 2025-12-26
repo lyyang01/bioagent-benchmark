@@ -57,11 +57,12 @@ Our code supports both OpenAI and Azure OpenAI APIs. We left all parameters at t
 #set config
 LLM_CONFIG = {
       "gpt-4o": {
-      "api_type": "openai",
-      "base_url": "xxx",
-      "api_key": "xxx",
-      "model": "xxx",
-    }
+        "api_type": "openai",
+        "base_url": "xxx",
+        "api_key": "xxx",
+        "model": "xxx",
+    },
+    ...
 }
 from langchain_openai import ChatOpenAI
 ChatOpenAI(
@@ -71,7 +72,6 @@ ChatOpenAI(
     temperature=0, 
 )
 
-
 ##FOR AUTOGEN
 #set config
 config_list = [
@@ -80,7 +80,8 @@ config_list = [
        "base_url": "xxx",
        "api_key": "xxx",
        "model": "xxx",
-    }]
+    }],
+    ...
 ]
 from autogen import UserProxyAgent
 llm_config = {"config_list": config_list, "seed": 42, "timeout": 7200, "temperature": 0}
@@ -94,29 +95,69 @@ user_proxy = UserProxyAgent(
 ```
 
 
-## 🚀 Quick Start
+## 🚀 Quick Start (For run workflow)
 
 Before starting:
 
-- Fill in your LLM credentials in model_config.py under autogen/langgraph/react-code.
-- Set your embedding model for retrieval: in run.py for autogen-code, or in rag.py for langgraph/react.
-- Check that every tool's Conda env name is correct in prompts/prompt_gradient.
+- Fill in your LLM credentials in `model_config.py` under `autogen/langgraph/react-code` in `src`.
+- Set your embedding model for retrieval: in `model_config.py` for autogen-code, or in `rag.py` for langgraph/react-code.
+- Check that every tool's Conda env name is correct in `prompts/prompt_gradient`.
+- Fill in each variable in bash scripts in `run_workflow` and confirm correct values and paths are fill in `PROMPT_JSON`, `LAB`, `RESULT_PATH`, `MODEL`, etc. 
 
-Then run any agent workflow with the scripts in the scripts folder.
+Then run any agent workflow with the bash scripts in `run_workflow`.
 
 FOR AUTOGEN
 ```bash
-bash scripts/autogen_run_workflow.sh
+bash run_workflow/autogen_run_workflow.sh
 ```
 
 FOR LANGGRAPH
 ```bash
-bash scripts/langgraph_run_workflow.sh
+bash run_workflow/langgraph_run_workflow.sh
 ```
 
 FOR REACT
 ```bash
-bash scripts/react_run_workflow.sh
+bash run_workflow/react_run_workflow.sh
+```
+
+## 🚀 Quick Start (For evaluation)
+
+Before starting: 
+
+- Ensure you have executed `run_workflow` so that the agent results exist in your output path.  
+  Alternatively, use the our snapshots stored in `log/log_by_workflow` or `log/log_by_eval` to run the evaluation pipeline.  
+  `log/log_by_workflow` keeps the raw workflow outputs for computing 17 metrics; `log/log_by_eval` keeps the post-computed JSON files for final scoring.  
+- Configure the evaluation LLM in `evaluation/model_config_eval.py`.
+- Fill in each variable in bash scripts in `run_eval` and confirm correct values and paths are fill in `PROMPT_JSON`, `LAB`, `RESULT_PATH`, `MODEL`, etc. 
+
+Next, extract the agent-generated plan, code, and RAG results from the workflow.
+
+```bash
+#FOR AUTOGEN
+python autogen_code_rag_plan_concat.py --model "gpt-4o" --lab "main_result"
+
+#FOR LANGGRAPH
+python langgraph_code_concat.py --model "gpt-4o" --lab "main_result"
+python langgraph_rag_concat.py --model "gpt-4o" --lab "main_result"
+
+#FOR REACT
+python react_code_concat.py --model "gpt-4o" --lab "main_result"
+python react_rag_concat.py --model "gpt-4o" --lab "main_result"
+```
+
+Run the evaluation pipeline for each framework:
+
+```bash
+#FOR AUTOGEN
+bash autogen_eval_pipeline.sh
+bash autogen_eval_source_usage.sh
+
+#FOR LANGGRAPH
+bash langgraph_eval_pipeline.sh
+
+#FOR REACT
+bash react_eval_pipeline.sh
 ```
 
 ## 📄 Citation
