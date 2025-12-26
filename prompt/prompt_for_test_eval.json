@@ -1,0 +1,15 @@
+{
+  "decoupler": 
+  {
+  "prompt_input": {
+    "basic": "Use Decoupler for automated cell type annotation of single-cell RNA sequencing data.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/decoupler/pbmc3k_raw.h5ad'\n- Marker genes: '/mnt/data00/share_data/agent_benchmark/decoupler/marker_genes.csv'\n\nMust-save Results:\n- Make sure cell type annotation result of decoupler is stored in adata.obs['cell_type'] and save adata.obs['cell_type'] as 'decoupler.csv'",
+    
+    "intermediate": "Use Decoupler for automated cell type annotation of single-cell RNA sequencing data.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/decoupler/pbmc3k_raw.h5ad'\n- Marker genes: '/mnt/data00/share_data/agent_benchmark/decoupler/marker_genes.csv'\n\nMust-save Results:\n- Make sure cell type annotation result of decoupler is stored in adata.obs['cell_type'] and save adata.obs['cell_type'] as 'decoupler.csv'\n\nKey Requirements:\n- Use ORA (Over-Representation Analysis) method from Decoupler\n- Rank cell types using t-test method\n- Assign top-ranked cell type to each cluster",
+    
+    "advanced": "Use Decoupler for automated cell type annotation of single-cell RNA sequencing data.\n\nDataset location:\n- Input data: '/mnt/data00/share_data/agent_benchmark/decoupler/pbmc3k_raw.h5ad'\n- Marker genes: '/mnt/data00/share_data/agent_benchmark/decoupler/marker_genes.csv'\n\nMust-save Results:\n- Make sure cell type annotation result of decoupler is stored in adata.obs['cell_type'] and save adata.obs['cell_type'] as 'decoupler.csv'\n\nCore Analysis Steps:\n1. Load and preprocess the single-cell data using Scanpy\n   - Filter cells and genes\n   - Handle mitochondrial genes\n   - Normalize and log-transform data\n2. Perform standard Scanpy workflow\n   - Identify highly variable genes\n   - Regress out total counts and mitochondrial percentage\n   - Scale data and run PCA\n   - Compute neighbors and UMAP\n   - Run Leiden clustering\n3. Use Decoupler's ORA method with marker genes\n4. Process ORA results to handle infinity values\n5. Rank cell types for each cluster using t-test method\n6. Assign the top cell type to each cluster\n7. Add cell type annotations to original AnnData object\n\nKey Requirements:\n- Use ORA method from Decoupler package\n- Map cell types to clusters based on highest enrichment scores\n- Handle infinity values in enrichment scores appropriately\n\nLibraries to Use:\n- scanpy\n- decoupler"
+  },
+  "conda_env": "agentbench",
+  "language": "python"
+}
+
+}

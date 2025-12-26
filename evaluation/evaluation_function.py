@@ -1,23 +1,17 @@
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import psutil
 import subprocess
 import time
-import os
 import numpy as np
 
 import os
 import openai
 import json
+from evaluation.model_config_eval import CONFIG_LIST
 
 
-CONFIG_LIST = [
-    {   
-        "model": "gpt-4o",
-        "api_key": "XXX",
-        "azure_endpoint": "XXX",
-        "api_type": "azure",
-        "api_version": "XXX",
-    },
-]
 
 
 def get_gpu_usage(gpu_id=0):
@@ -37,13 +31,15 @@ def get_gpu_usage(gpu_id=0):
         gpu_memory_used.append(int(memory_used))  # 单位为 MiB
     #import pdb
     #pdb.set_trace()
+    #import pdb
     return gpu_util[gpu_id], gpu_memory_used[gpu_id]
 
 ##---------------------Monitor-----------------------------------  
-def monitor_process(script_path, lab, tool_name, model_name, log_file, gpu_id):
+def monitor_process(script_path, tool_name, model_name, result_type, prompt_path, result_path, log_file):
     """启动脚本并监控其资源使用情况，将结果保存到日志文件"""
     #process = subprocess.Popen(["python", script_path, "--task", tool_name])
-    process = subprocess.Popen(["python", script_path, "--task", tool_name, "--model", model_name, "--gpu", str(gpu_id), "--lab", str(lab)])
+    process = subprocess.Popen(["python", script_path, "--task", tool_name, "--model", model_name, "--lab", result_type, "--prompt_path", prompt_path, "--result_path", result_path])
+    
     target_pid = process.pid
     print(f"Target script PID: {target_pid}")
 
@@ -71,7 +67,7 @@ def monitor_process(script_path, lab, tool_name, model_name, log_file, gpu_id):
                 memory_usage_kb = psutil.Process(target_pid).memory_info().rss / 1024  # 转换为 KB
                 
                 # 获取 GPU 使用情况
-                gpu_util, gpu_memory = get_gpu_usage(gpu_id)
+                gpu_util, gpu_memory = get_gpu_usage()
                 #gpu_util = get_gpu_usage()
                 if gpu_util is not None:
                     max_gpu_util = max(max_gpu_util, gpu_util)
@@ -121,18 +117,23 @@ def monitor_process(script_path, lab, tool_name, model_name, log_file, gpu_id):
 ##---------------------Monitor-----------------------------------
 
 ##---------------------Plan Scores-----------------------------------
-def plan_score(plan_str, tool_name):
-    config_list = CONFIG_LIST
+def plan_score(plan_str, tool_name, prompt_path, eval_model="gpt-4o"):
+    config_list = CONFIG_LIST[eval_model]
     try:
         openai.api_type = config_list[0]['api_type']
     except:
         pass
-    openai.azure_endpoint = config_list[0]['azure_endpoint']
-    openai.api_version = config_list[0]['api_version']
+    try:
+        openai.api_version = config_list[0]['api_version']
+        openai.azure_endpoint = config_list[0]['azure_endpoint']
+    except:
+        openai.base_url = config_list[0]['base_url']
+
     openai.api_key = config_list[0]['api_key']
+    
     #read prompt.json
     import json
-    with open("/mnt/data00/share_data/prompt_gradient.json") as f:
+    with open(prompt_path) as f:
         user_prompt = json.load(f)
     #with open(plan_file_path) as f:
     #    plan_str = f.read()
@@ -203,9 +204,15 @@ The bioinformatics task description:\n'''+f"{task}\n"+"The plan by agent:\n"+f"{
     temperature=0,
     #max_tokens=2048,
     )
+    #import pdb
+    #pdb.set_trace()
+
     tmp = []
     json_str = ""
     indic = 0
+
+    #import pdb
+    #pdb.set_trace()
     #print(model_reply)
     while(json_str==""):
         if indic > 3:
@@ -250,18 +257,22 @@ The bioinformatics task description:\n'''+f"{task}\n"+"The plan by agent:\n"+f"{
 ##---------------------Plan Scores-----------------------------------
 
 ##---------------------Code Scores-----------------------------------
-def code_score(code_file_path, tool_name):
-    config_list = CONFIG_LIST
+def code_score(code_file_path, tool_name, prompt_path, gt_path, eval_model="gpt-4o"):
+    config_list = CONFIG_LIST[eval_model]
     try:
         openai.api_type = config_list[0]['api_type']
     except:
         pass
-    openai.azure_endpoint = config_list[0]['azure_endpoint']
-    openai.api_version = config_list[0]['api_version']
+    try:
+        openai.api_version = config_list[0]['api_version']
+        openai.azure_endpoint = config_list[0]['azure_endpoint']
+    except:
+        openai.base_url = config_list[0]['azure_endpoint']
+
     openai.api_key = config_list[0]['api_key']
     import json
     #read prompt.json
-    with open("/mnt/data00/share_data/prompt_gradient.json") as f:
+    with open(prompt_path) as f:
         user_prompt = json.load(f)
     
     task = user_prompt[tool_name]["prompt_input"]
@@ -271,10 +282,10 @@ def code_score(code_file_path, tool_name):
     #if code_str == "":
         
     if tool_name in ["cellchat", "seurat-1", "seurat-2", "sctransform", "singlecellhaystack", "scpnmf", "scry", "scorpius", "nichenet"]:
-        with open(f"/mnt/data00/share_data/groundtruth_script/{tool_name}_gold.r") as f:
+        with open(f"{gt_path}/{tool_name}_gold.r") as f:
             gold_code_str = f.read()
     else:
-        with open(f"/mnt/data00/share_data/groundtruth_script/{tool_name}_gold.py") as f:
+        with open(f"{gt_path}/{tool_name}_gold.py") as f:
             gold_code_str = f.read()
 
     clean_code_str = ""
@@ -314,7 +325,7 @@ Rate each attribute on a scale of 1 to 5, where:
 Output Format:
 Provide your evaluation in the following structured format:
 
-1. Evaluation of Bioinformatics Task Code (json format):
+1. Evaluation of Bioinformatics Task Code (strictly in json format):
 ```json
 {
    "Key_Segment_Matching_Degree": [Score],
@@ -371,8 +382,16 @@ The bioinformatics task description:\n'''+f"{task}\n" + "The reference code:\n"+
         if type(json_str) == dict:
             gpt_scores = json_str
         else:
-            gpt_scores = eval(json_str)
-
+            try:
+                gpt_scores = eval(json_str)
+            except:
+                gpt_scores = {}
+                gpt_scores["Key_Segment_Matching_Degree"] = 0.0
+                gpt_scores["Efficiency"] = 0.0
+                gpt_scores["Completeness"] = 0.0
+                gpt_scores["Readability"] = 0.0
+                gpt_scores["Logicality"] = 0.0
+        
         for key_, score_ in gpt_scores.items():
             code_scores["gpt_score"][key_] = score_
 
@@ -451,61 +470,152 @@ The bioinformatics task description:\n'''+f"{task}\n" + "The reference code:\n"+
 
     code_scores["obj_score"]["ast_sim"] = similarity
 
-    #pylint evaluation
-    import subprocess
-    import json
-
-    def run_pylint(file_path):
-        """
-        使用 subprocess 运行 pylint 并获取评分和输出。
-        
-        :param file_path: 要检查的 Python 文件路径
-        :return: Pylint 的评分和输出
-        """
-        try:
-            # 构造 pylint 命令
-            # 使用 --output-format=json 以 JSON 格式输出结果
-            #command = ["pylint", "--output-format=json", file_path]
-            command = ["pylint", file_path]
-            # 运行 pylint 命令
-            result = subprocess.run(command, capture_output=True, text=True)
-            
-            # 获取 pylint 的输出
-            output = result.stdout.strip().split("\n")[-1]
-            
-            # 提取评分信息
-            #score = None
-            tmp = output.split(" ")[6]
-            score = tmp.split("/")[0]
-            
-            return score, output
-        except subprocess.CalledProcessError as e:
-            print(f"Error running pylint: {e}")
-            return None, e.stderr.strip()
-        except json.JSONDecodeError as e:
-            print(f"Error parsing pylint output: {e}")
-            return None, output
-    if tool_name in ["cellchat", "seurat-1", "seurat-2", "sctransform", "singlecellhaystack", "scpnmf", "scry", "scorpius", "nichenet"]:
-        score = 0.0
-        code_scores["obj_score"]["pylint_score"] = score
-
-    elif clean_code_str == "":
-        score = 0.0
-        code_scores["obj_score"]["pylint_score"] = score
-
-    else:
-        score, output = run_pylint(code_file_path)
-    #print("Pylint Score:", score)
-    #print("\nPylint Output:")
-    #print(output)
-        code_scores["obj_score"]["pylint_score"] = eval(score)
-
-    #import pdb
-    #pdb.set_trace()
     return code_scores
-    #with open(os.path.join(output_path,f"{tool_name}_code_score.json"), "w", encoding="utf-8") as f:
-    #    json.dump(code_scores, f)
+    
 ##---------------------Code Scores-----------------------------------
+
+
+##---------------------Cross Judge Code Scores-----------------------------------
+def code_score_cross_judge(code_file_path, tool_name, prompt_path, gt_path, eval_model="gpt-4o"):
+    config_list = CONFIG_LIST[eval_model]
+    try:
+        openai.api_type = config_list[0]['api_type']
+    except:
+        pass
+    try:
+        openai.api_version = config_list[0]['api_version']
+        openai.azure_endpoint = config_list[0]['azure_endpoint']
+    except:
+        openai.base_url = config_list[0]['azure_endpoint']
+
+    openai.api_key = config_list[0]['api_key']
+    import json
+    #read prompt.json
+    with open(prompt_path) as f:
+        user_prompt = json.load(f)
+    
+    task = user_prompt[tool_name]["prompt_input"]
+    
+    with open(code_file_path) as f:
+        code_str = f.read()
+    #if code_str == "":
+        
+    if tool_name in ["cellchat", "seurat-1", "seurat-2", "sctransform", "singlecellhaystack", "scpnmf", "scry", "scorpius", "nichenet"]:
+        with open(f"{gt_path}/{tool_name}_gold.r") as f:
+            gold_code_str = f.read()
+    else:
+        with open(f"{gt_path}/{tool_name}_gold.py") as f:
+            gold_code_str = f.read()
+
+    clean_code_str = ""
+    clean_gold_code_str = ""
+    for i in code_str.split("\n"):
+        if i.startswith("#"):
+            continue
+        if i == "":
+            continue
+        clean_code_str += i + "\n"
+
+    for i in gold_code_str.split("\n"):
+        if i.startswith("#"):
+            continue
+        if i == "":
+            continue
+        clean_gold_code_str += i + "\n"
+
+    code_scores = {"gpt_score":{}, "obj_score":{}}
+    prompt = '''
+You are tasked with evaluating a bioinformatics task code by comparing it with a reference code. Please follow the guidelines below to provide a structured evaluation.
+Task:
+Evaluate the provided bioinformatics task code based on the following attributes:
+(1) Key Segment Matching Degree: How well does the code match the key segments of the reference code? Are essential parts of the reference code present and correctly implemented?
+(2) Efficiency: Is the code optimized for performance? Does it use efficient algorithms and data structures?
+(3) Completeness: Does the code cover all necessary functionalities and tasks as required? Are there any missing parts?
+(4) Readability: Is the code easy to read and understand? Are there proper comments, variable names, and formatting?
+(5) Logicality: Is the code logically structured? Are the steps and processes well-organized and coherent?
+Evaluation Criteria:
+Rate each attribute on a scale of 1 to 5, where:
+    1~2 = Poor
+    2~3 = Fair
+    3~4 = Good
+    4~5 = Very Good
+    5 = Excellent
+
+Output Format:
+Provide your evaluation in the following structured format:
+
+1. Evaluation of Bioinformatics Task Code (strictly in json format):
+```json
+{
+   "Key_Segment_Matching_Degree": [Score],
+   "Efficiency": [Score],
+   "Completeness": [Score],
+   "Readability": [Score],
+   "Logicality": [Score],
+}
+```json
+2. Summary:
+   - Briefly summarize your overall assessment of the code.
+
+Now, I provide you with the bioinformatics task description, the reference code and the code written by agent for scoring.
+The bioinformatics task description:\n'''+f"{task}\n" + "The reference code:\n"+ f"{gold_code_str}\n" + "The code by agent:" + f"{code_str}"
+    if clean_code_str == "":
+        code_scores["gpt_score"]["Key_Segment_Matching_Degree"] = 0.0
+        code_scores["gpt_score"]["Efficiency"] = 0.0
+        code_scores["gpt_score"]["Completeness"] = 0.0
+        code_scores["gpt_score"]["Readability"] = 0.0
+        code_scores["gpt_score"]["Logicality"] = 0.0
+    else:
+        #response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
+        model=config_list[0]['model'], # replace this value with the deployment name you chose when you deployed the associated model.
+        messages = [{"role":"user", "content": prompt}],
+        temperature=0,
+        #max_tokens=2048,
+        )
+        indic = 0
+        json_str = ""
+        while(json_str==""):
+            if indic > 3:
+                break
+            model_reply = response.choices[0].message.content
+            #print(model_reply)
+            import re
+            tmp = model_reply.split("\n\n")[0]
+            tmp = "".join(tmp.split("\n")[1:])
+            tmp = "".join(tmp.split(" "))
+            pattern = r"```json(.*?)```"
+            matches = re.findall(pattern, tmp, re.DOTALL)
+            json_str = '\n'.join(matches)
+            if json_str == "":
+                try:
+                    json_str = eval(model_reply)
+                except:
+                    pass
+            indic += 1
+        #if json_str == "":
+        #    json_str = tmp
+
+        #import pdb
+        #pdb.set_trace()
+        if type(json_str) == dict:
+            gpt_scores = json_str
+        else:
+            try:
+                gpt_scores = eval(json_str)
+            except:
+                gpt_scores = {}
+                gpt_scores["Key_Segment_Matching_Degree"] = 0.0
+                gpt_scores["Efficiency"] = 0.0
+                gpt_scores["Completeness"] = 0.0
+                gpt_scores["Readability"] = 0.0
+                gpt_scores["Logicality"] = 0.0
+        
+        for key_, score_ in gpt_scores.items():
+            code_scores["gpt_score"][key_] = score_
+    return code_scores
+##---------------------Cross Judge Code Scores-----------------------------------
+
 
 ##---------------------CPU -----------------------------------
 def monitor_process_code(code_file_path, log_file, gpu_id):
@@ -615,18 +725,19 @@ def monitor_process_code(code_file_path, log_file, gpu_id):
 ##---------------------CPU -----------------------------------
 
 
-def task_completion_react(workflow_str, plan_str, root_path, tool_name, lang):
+def task_completion_react(workflow_str, plan_str, root_path, tool_name, lang, eval_model="gpt-4o"):
+    config_list = CONFIG_LIST[eval_model]
 
     import traceback
-    import openai
-    config_list = CONFIG_LIST
     try:
         openai.api_type = config_list[0]['api_type']
     except:
         pass
-    openai.azure_endpoint = config_list[0]['azure_endpoint']
-    openai.api_version = config_list[0]['api_version']
-    openai.api_key = config_list[0]['api_key']
+    try:
+        openai.api_version = config_list[0]['api_version']
+        openai.azure_endpoint = config_list[0]['azure_endpoint']
+    except:
+        openai.base_url = config_list[0]['azure_endpoint']
     # Get structured steps from LLM
 
     prompt_plan = f'Extract the planning steps as: ```json ["Step 1 ...", "Step 2 ...", ...] ``` From: {plan_str}'
@@ -638,10 +749,10 @@ def task_completion_react(workflow_str, plan_str, root_path, tool_name, lang):
     result = response.choices[0].message.content
     
     try:
-        print(result)
+        #print(result)
         plan_list = json.loads(result.split("```json")[1].split("```")[0])
     except Exception as e:
-        print(traceback.format_exc())
+        #print(traceback.format_exc())
         raise ValueError("Failed to parse planning steps from LLM response") from e
 
 
@@ -674,7 +785,7 @@ def task_completion_react(workflow_str, plan_str, root_path, tool_name, lang):
     
     if not step_list:
         if lang=="R":
-            code_file_path = os.path.join(root_path, f"{tool_name}_code.R")
+            code_file_path = os.path.join(root_path, f"{tool_name}_code.r")
         else:
             code_file_path = os.path.join(root_path, f"{tool_name}_code.py")
         with open(code_file_path, "r", encoding="utf-8") as f:
@@ -695,13 +806,13 @@ def task_completion_react(workflow_str, plan_str, root_path, tool_name, lang):
             
             try:
                 step_list = json.loads(result.split("```json")[1].split("```")[0])
-                print(code_file_path)
-                print("plan_list")
-                print(plan_list)
-                print("completed_step")
-                print(step_list)
+                #print(code_file_path)
+                #print("plan_list")
+                #print(plan_list)
+                #print("completed_step")
+                #print(step_list)
             except Exception as e:
-                print(traceback.format_exc())
+                #print(traceback.format_exc())
                 raise ValueError("Failed to parse completed steps from LLM response") from e
 
     completed_step=len(step_list)
@@ -781,10 +892,7 @@ def task_completion_langgraph(workflow_str):
     
     return tc_dict
 
-
-
-
-def task_completion_autogen(workflow_str):
+def task_completion_autogen(workflow_str, eval_model="gpt-4o"):
     workflow_str_list = eval(workflow_str)
     plan_str = ""
     manager_str = []
@@ -826,7 +934,7 @@ def task_completion_autogen(workflow_str):
     
     #with open(workflow_path) as f:
     #    workflow_data = f.read()
-    config_list = CONFIG_LIST
+    config_list = CONFIG_LIST[eval_model]
     prompt = """ 
 Given a bioinformatics analysis plan, please extract the steps and summarize them as a list. The output should be formatted as a JSON object containing numbered steps with their descriptions. Ensure the JSON structure includes keys like `step_1`, `step_2`, etc., and each step should have a clear description. Avoid any markdown formatting and ensure the JSON is valid. 
 Example output format:  
@@ -846,10 +954,13 @@ I will provide you the plan information as the following:\n
         openai.api_type = config_list[0]['api_type']
     except:
         pass
-    openai.azure_endpoint = config_list[0]['azure_endpoint']
-    openai.api_version = config_list[0]['api_version']
+    try:
+        openai.api_version = config_list[0]['api_version']
+        openai.azure_endpoint = config_list[0]['azure_endpoint']
+    except:
+        openai.base_url = config_list[0]['azure_endpoint']
     openai.api_key = config_list[0]['api_key']
-
+    
     #response = openai.ChatCompletion.create(
     response = openai.chat.completions.create(
     model=config_list[0]['model'], # replace this value with the deployment name you chose when you deployed the associated model.
@@ -948,11 +1059,11 @@ I provide you with the all steps of one bioinformatics task as the following:\n
     return tc_dict
 
 ##---------------------Task Completion -----------------------------------
-def task_completion(workflow_str):
+def task_completion(workflow_str, eval_model="gpt-4o"):
     tc_dict = {}
     #with open(workflow_path) as f:
     #    workflow_data = f.read()
-    config_list = CONFIG_LIST
+    config_list = CONFIG_LIST[eval_model]
 
     prompt = """
 You are tasked with evaluating the task completion rate of an intelligent agent system based on its workflow. Planner in the workflow provides a series of steps of the task that the agent must complete. The task completion rate is defined as the ratio of the steps completed by the agent to the total planned steps.
@@ -990,8 +1101,11 @@ I provide you the workflow of the multi-agent system:
         openai.api_type = config_list[0]['api_type']
     except:
         pass
-    openai.azure_endpoint = config_list[0]['azure_endpoint']
-    openai.api_version = config_list[0]['api_version']
+    try:
+        openai.api_version = config_list[0]['api_version']
+        openai.azure_endpoint = config_list[0]['azure_endpoint']
+    except:
+        openai.base_url = config_list[0]['azure_endpoint']
     openai.api_key = config_list[0]['api_key']
 
     #response = openai.ChatCompletion.create(
@@ -1063,10 +1177,10 @@ def round_statics_m2(workflow_list, step_number):
 ##---------------------Round -----------------------------------
 
 ##---------------------RAG -----------------------------------
-def rag_eval(rag_list, tool_name):
+def rag_eval(rag_list, tool_name, database_path,eval_model="gpt-4o"):
     if rag_list == []:
         return 0.0, 0.0, [None, None, None]
-    config_list = CONFIG_LIST
+    config_list = CONFIG_LIST[eval_model]
     retrieval_list = []
     new_rag_list = []
     for i in rag_list:
@@ -1093,13 +1207,13 @@ def rag_eval(rag_list, tool_name):
     
     #open database file
     if tool_name == "scgen-integration":
-        with open(f"/mnt/data00/share_data/database/scgen.md", "r", encoding="utf-8") as f:
+        with open(f"{database_path}/scgen.md", "r", encoding="utf-8") as f:
             rag_ref = f.read()
     elif tool_name == "seurat-1" or tool_name=="seurat-2":
-        with open(f"/mnt/data00/share_data/database/seurat.md", "r", encoding="utf-8") as f:
+        with open(f"{database_path}/seurat.md", "r", encoding="utf-8") as f:
             rag_ref = f.read()
     else:
-        with open(f"/mnt/data00/share_data/database/{tool_name}.md", "r", encoding="utf-8") as f:
+        with open(f"{database_path}/{tool_name}.md", "r", encoding="utf-8") as f:
             rag_ref = f.read()
     from fuzzywuzzy import fuzz
     for i in retrieval_list:
@@ -1160,14 +1274,17 @@ Please strictly follow the output format.
 I provide you the RAG process of the multi-agent system:
 
 """+ str(new_rag_list)
-    print(f"new_rag_list: {new_rag_list}")
+
     import openai
     try:
         openai.api_type = config_list[0]['api_type']
     except:
         pass
-    openai.azure_endpoint = config_list[0]['azure_endpoint']
-    openai.api_version = config_list[0]['api_version']
+    try:
+        openai.api_version = config_list[0]['api_version']
+        openai.azure_endpoint = config_list[0]['azure_endpoint']
+    except:
+        openai.base_url = config_list[0]['azure_endpoint']
     openai.api_key = config_list[0]['api_key']
 
     #response = openai.ChatCompletion.create(
@@ -1184,7 +1301,7 @@ I provide you the RAG process of the multi-agent system:
         if indic > 3:
             break
         model_reply = response.choices[0].message.content
-        print(f"model_reply: {model_reply}")
+        #print(model_reply)
         pattern = r"```json(.*?)```"
         matches = re.findall(pattern, model_reply, re.DOTALL)
         json_str = '\n'.join(matches)
@@ -1205,10 +1322,12 @@ I provide you the RAG process of the multi-agent system:
     return if_retrieval_accuracy, retrieval_accuracy, [total_step, retrieval_step, retrieval_relate_step]
 ##---------------------RAG -----------------------------------
 
-def rag_eval_noplan(rag_list, tool_name):
+
+def rag_eval_noplan(rag_list, tool_name, database_path, eval_model="gpt-4o"):
+    config_list = CONFIG_LIST[eval_model]
     if rag_list == []:
         return 0.0, 0.0, [None, None, None]
-    config_list = CONFIG_LIST
+    
     retrieval_list = []
     new_rag_list = []
     for i in rag_list:
@@ -1235,13 +1354,13 @@ def rag_eval_noplan(rag_list, tool_name):
     
     #open database file
     if tool_name == "scgen-integration":
-        with open(f"/mnt/data00/share_data/database/scgen.md", "r", encoding="utf-8") as f:
+        with open(f"{database_path}/scgen.md", "r", encoding="utf-8") as f:
             rag_ref = f.read()
     elif tool_name == "seurat-1" or tool_name=="seurat-2":
-        with open(f"/mnt/data00/share_data/database/seurat.md", "r", encoding="utf-8") as f:
+        with open(f"{database_path}/seurat.md", "r", encoding="utf-8") as f:
             rag_ref = f.read()
     else:
-        with open(f"/mnt/data00/share_data/database/{tool_name}.md", "r", encoding="utf-8") as f:
+        with open(f"{database_path}/{tool_name}.md", "r", encoding="utf-8") as f:
             rag_ref = f.read()
     from fuzzywuzzy import fuzz
     for i in retrieval_list:
@@ -1309,8 +1428,11 @@ I provide you the RAG process of the agent system:
         openai.api_type = config_list[0]['api_type']
     except:
         pass
-    openai.azure_endpoint = config_list[0]['azure_endpoint']
-    openai.api_version = config_list[0]['api_version']
+    try:
+        openai.api_version = config_list[0]['api_version']
+        openai.azure_endpoint = config_list[0]['azure_endpoint']
+    except:
+        openai.base_url = config_list[0]['azure_endpoint']
     openai.api_key = config_list[0]['api_key']
 
     #response = openai.ChatCompletion.create(
@@ -1347,7 +1469,100 @@ I provide you the RAG process of the agent system:
     if_retrieval_accuracy = out["accuracy_score"]
     return if_retrieval_accuracy, retrieval_accuracy, [total_step, retrieval_step, retrieval_relate_step]
 
-def consistency_with_plan(workflow_str_list, plan_str):
+def consistency_with_plan(plan_str, code_file_path, eval_model="gpt-4o"):
+
+    
+    with open(code_file_path) as f:
+        code_str = f.read()
+    
+
+    clean_code_str = ""
+    for i in code_str.split("\n"):
+        if i.startswith("#"):
+            continue
+        if i == "":
+            continue
+        clean_code_str += i + "\n"
+    if clean_code_str == "":
+        return {"score": 0, "evaluation_summary": "The code is empty or contains only comments.", "detailed_analysis": {"plan_coverage": "0 of plan elements implemented", "technical_alignment": "No technical alignment", "functional_completeness": "No functional completeness"}}
+
+    config_list = CONFIG_LIST[eval_model]
+    prompt = """
+Act as an expert Code Implementation Auditor. Your task is to analyze given plans and corresponding code implementations, then evaluate how well the code executes the original plan. Follow these steps:
+
+1. Carefully review the provided plan with its key requirements and objectives
+2. Thoroughly examine the submitted code implementation
+3. Perform a point-by-point comparison between plan specifications and code execution
+4. Assess implementation completeness, logical alignment, and technical fidelity
+5. Rate the implementation on a 0-5 scale using this rubric:
+   - 5~4: Perfect alignment, almost all plan aspects implemented correctly
+   - 4~3: Minor omissions/errors not affecting core functionality
+   - 3~2: Partial implementation with some key elements missing
+   - 2~1: Significant deviations affecting primary objectives
+   - 1~0: Superficial implementation missing most requirements
+
+Output a JSON object with this exact structure:
+{
+  "score": [0~5],
+  "evaluation_summary": "[concise 2-3 sentence assessment]",
+  "detailed_analysis": {
+    "plan_coverage": "[xx of plan elements implemented]",
+    "technical_alignment": "[analysis of architectural consistency]",
+    "functional_completeness": "[assessment of requirement fulfillment]"
+  }
+}
+
+The given plan as follows:""" + "\n" + plan_str + """\n\nThe corresponding code implementations as follows:""" + "\n" + code_str
+    import openai
+    try:
+        openai.api_type = config_list[0]['api_type']
+    except:
+        pass
+    try:
+        openai.api_version = config_list[0]['api_version']
+        openai.azure_endpoint = config_list[0]['azure_endpoint']
+    except:
+        openai.base_url = config_list[0]['azure_endpoint']
+    openai.api_key = config_list[0]['api_key']
+
+    #response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
+    model=config_list[0]['model'], # replace this value with the deployment name you chose when you deployed the associated model.
+    messages = [{"role":"user", "content": prompt}],
+    temperature=0,
+    #max_tokens=2048,
+    )
+    import re
+    json_str = ""
+    indic = 0
+    while(json_str==""):
+        if indic > 3:
+            break
+        model_reply = response.choices[0].message.content
+        #print(model_reply)
+        pattern = r"```json(.*?)```"
+        matches = re.findall(pattern, model_reply, re.DOTALL)
+        json_str = '\n'.join(matches)
+        indic += 1
+        if json_str == "":
+            try:
+                json_str = eval(model_reply)
+            except:
+                pass
+        #if json_str == "":
+        #    json_str = model_reply
+    if type(json_str) == dict:
+        out = json_str
+    else:
+        out = eval(json_str)
+    #import pdb
+    #pdb.set_trace()
+    
+    return out
+
+def consistency_with_plan_lang(workflow_str_list, plan_str, eval_model="gpt-4o"):
+    
+    config_list = CONFIG_LIST[eval_model]
     code_str = ""
     for i,_ in enumerate(workflow_str_list):
         if workflow_str_list[i]["name"] == "code_generate" and workflow_str_list[i]["content"] not in code_str:
@@ -1355,7 +1570,7 @@ def consistency_with_plan(workflow_str_list, plan_str):
     if code_str == "":
         return {"score": 0, "evaluation_summary": "The code is empty or contains only comments.", "detailed_analysis": {"plan_coverage": "0 of plan elements implemented", "technical_alignment": "No technical alignment", "functional_completeness": "No functional completeness"}}
 
-    config_list = CONFIG_LIST
+
     prompt = """
 Act as an expert Code Implementation Auditor. Your task is to analyze given plans and corresponding code implementations, then evaluate how well the code executes the original plan. Follow these steps:
 
@@ -1388,8 +1603,11 @@ The given plan as follows:""" + "\n" + str(plan_str) + """\n\nThe corresponding 
         openai.api_type = config_list[0]['api_type']
     except:
         pass
-    openai.azure_endpoint = config_list[0]['azure_endpoint']
-    openai.api_version = config_list[0]['api_version']
+    try:
+        openai.api_version = config_list[0]['api_version']
+        openai.azure_endpoint = config_list[0]['azure_endpoint']
+    except:
+        openai.base_url = config_list[0]['azure_endpoint']
     openai.api_key = config_list[0]['api_key']
 
     #response = openai.ChatCompletion.create(
@@ -1406,7 +1624,7 @@ The given plan as follows:""" + "\n" + str(plan_str) + """\n\nThe corresponding 
         if indic > 3:
             break
         model_reply = response.choices[0].message.content
-        print(model_reply)
+        #print(model_reply)
         pattern = r"```json(.*?)```"
         matches = re.findall(pattern, model_reply, re.DOTALL)
         json_str = '\n'.join(matches)

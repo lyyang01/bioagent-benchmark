@@ -91,22 +91,26 @@ def extract_structured_steps(input_json):
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str)
-    parser.add_argument("--lab", type=str)
+    parser.add_argument("--model", type=str,default="gpt-4o")
+    parser.add_argument("--lab", type=str, default="main_result")
     parser.add_argument("--fw", type=str, default="langgraph")
+    parser.add_argument("--result_path", type=str, default="../../logs/logs_by_workflow")
+    parser.add_argument("--prompt_path", type=str, default="../../prompt/prompt_gradient.json")
+
     args = parser.parse_args()
 
     lab = args.lab
     model = args.model
     frame_work = args.fw
     
-    json_path = "../prompt_gradient.json"
+    json_path = args.prompt_path
+    result_path = args.result_path
 
     with open(json_path, "r", encoding="utf-8") as f:
         task_data = json.load(f)
 
     for tool in task_data:
-        root_path = f"../results/{lab}/{frame_work}/{model}/{tool}/"
+        root_path = f"{result_path}/{lab}/{frame_work}/{model}/{tool}/"
         if not os.path.exists(root_path):
             print(f"Path does not exist: {root_path}")
             continue

@@ -1,1 +1,0 @@
-# boos-copilot
