@@ -50,7 +50,7 @@ We provided packed conda environments at https://doi.org/10.5281/zenodo.17455069
 
 ## 🏗️ LLM Configuration
 
-We used OpenAI’s official API function and left all parameters at their defaults except that we manually set temperature to 0.
+Our code supports both OpenAI and Azure OpenAI APIs. We left all parameters at their defaults except that temperature is set to 0. You can config LLM in `model_config.py` in each framework code under `src` folder.
 
 ```python
 ##FOR LANGGRAPH and REACT
@@ -75,12 +75,12 @@ ChatOpenAI(
 ##FOR AUTOGEN
 #set config
 config_list = [
-  {
+  "gpt-4o":[{
        "api_type": "openai",
        "base_url": "xxx",
        "api_key": "xxx",
        "model": "xxx",
-    }
+    }]
 ]
 from autogen import UserProxyAgent
 llm_config = {"config_list": config_list, "seed": 42, "timeout": 7200, "temperature": 0}
