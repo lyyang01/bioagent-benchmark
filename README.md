@@ -176,7 +176,7 @@ If you use this framework or dataset in your research, please cite our paper:
 
 ## 📋 License
 
-This project is licensed under the MIT License - see the [LICENSE](https://opensource.org/licenses/MIT) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 
 ---
