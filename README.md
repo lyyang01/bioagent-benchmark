@@ -45,6 +45,8 @@ Saved results from codes written by human researchers. These results can be h5ad
 
 Input prompts used in agents. 50 prompts for 'main' test and 13*2 prompts for 'multiple-datasets' test. Besides, for "main", gradient prompts are in the json file as well.
 
+Besides, we also provide some supplementary json results at https://doi.org/10.5281/zenodo.18447519 for our experiments, which includes the raw result for all 50 tasks with every individual metric, the detailed result consistency for all 50 tasks, and the raw workflow outputs for experiments.
+
 ## 📈 Environments
 We provided packed conda environments at https://doi.org/10.5281/zenodo.17455069.
 
