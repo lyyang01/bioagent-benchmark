@@ -1,10 +1,10 @@
-# Benchmarking LLM Agents for Single-cell Omics Analysis
+# Benchmarking LLM-based agents for single-cell omics analysis
 
 [![Paper](https://img.shields.io/badge/Paper-arXiv-red)](https://arxiv.org/abs/2508.13201) [![Dataset](https://img.shields.io/badge/Dataset-Available-blue)](https://doi.org/10.5281/zenodo.17291196) [![License](https://img.shields.io/badge/License-MIT-yellow)](https://opensource.org/licenses/MIT)
 
 ## Overview
 
-This repository contains the code and data for **"Benchmarking LLM Agents for Single-cell Omics Analysis"**, a comprehensive evaluation framework designed to systematically assess the capabilities of Large Language Model (LLM)-based agents in single-cell omics analysis tasks.
+This repository contains the code and data for **"Benchmarking LLM-based agents for single-cell omics analysis"**, a comprehensive evaluation framework designed to systematically assess the capabilities of Large Language Model (LLM)-based agents in single-cell omics analysis tasks.
 
 ![Framework Overview](./asserts/framework.png)<p align="center">
 Fig1.Overview of the benchmarking framework architecture
