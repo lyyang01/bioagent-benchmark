@@ -167,11 +167,14 @@ bash react_eval_pipeline.sh
 If you use this framework or dataset in your research, please cite our paper:
 
 ```bibtex
-@article{author2025benchmarking,
-  title={Benchmarking LLM Agents for Single-cell Omics Analysis},
-  author={Author, First and Author, Second and Author, Third},
-  journal={arXiv preprint arXiv:XXXX.XXXXX},
-  year={2025}
+@misc{liu2026benchmarkingllmbasedagentssinglecell,
+      title={Benchmarking LLM-based Agents for Single-cell Omics Analysis}, 
+      author={Yang Liu and Lu Zhou and Xiawei Du and Ruikun He and Rongbo Shen and Yixue Li},
+      year={2026},
+      eprint={2508.13201},
+      archivePrefix={arXiv},
+      primaryClass={q-bio.GN},
+      url={https://arxiv.org/abs/2508.13201}, 
 }
 ```
 
